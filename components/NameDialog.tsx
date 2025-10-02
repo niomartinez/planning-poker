@@ -10,11 +10,12 @@ import { cn } from '@/lib/utils';
 interface NameDialogProps {
   open: boolean;
   onSubmit: (name: string, emoji: string) => void;
+  onCancel?: () => void;
   currentName?: string;
   currentEmoji?: string;
 }
 
-export function NameDialog({ open, onSubmit, currentName = '', currentEmoji = '😀' }: NameDialogProps) {
+export function NameDialog({ open, onSubmit, onCancel, currentName = '', currentEmoji = '😀' }: NameDialogProps) {
   const [name, setName] = useState(currentName);
   const [selectedEmoji, setSelectedEmoji] = useState(currentEmoji);
 
@@ -32,8 +33,14 @@ export function NameDialog({ open, onSubmit, currentName = '', currentEmoji = '�
     }
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen && onCancel) {
+      onCancel();
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={() => {}}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl">Join Planning Poker</DialogTitle>

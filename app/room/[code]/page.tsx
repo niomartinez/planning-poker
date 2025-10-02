@@ -169,9 +169,7 @@ export default function RoomPage() {
   };
 
   const handleReveal = () => {
-    if (allVoted) {
-      sendMessage({ type: 'reveal' });
-    }
+    sendMessage({ type: 'reveal' });
   };
 
   const handleReset = () => {
@@ -327,7 +325,7 @@ export default function RoomPage() {
           )}
 
           {/* Voting Cards + Action Button - Bottom */}
-          <div className="shrink-0 space-y-2">
+          <div className="shrink-0 space-y-2 relative z-10">
             {currentPlayer && !roomState.isRevealed && (
               <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
                 {VOTE_OPTIONS.map((value) => (
@@ -344,12 +342,12 @@ export default function RoomPage() {
 
             {/* Action Button */}
             {roomState.players.length > 0 && (
-              <div className="flex justify-center">
+              <div className="flex justify-center relative z-50">
                 {!roomState.isRevealed ? (
                   <Button
                     onClick={handleReveal}
                     size="sm"
-                    className="gap-1.5 h-8"
+                    className="gap-1.5 h-8 pointer-events-auto cursor-pointer"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     Reveal {!allVoted && '(Some pending)'}
@@ -358,7 +356,7 @@ export default function RoomPage() {
                   <Button
                     onClick={handleReset}
                     size="sm"
-                    className="gap-1.5 h-8"
+                    className="gap-1.5 h-8 pointer-events-auto cursor-pointer"
                     variant="secondary"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
@@ -375,6 +373,10 @@ export default function RoomPage() {
       <NameDialog
         open={showNameDialog}
         onSubmit={handleNameSubmit}
+        onCancel={() => {
+          setShowNameDialog(false);
+          setEditingName(false);
+        }}
         currentName={editingName ? currentPlayer?.name : ''}
         currentEmoji={editingName ? currentPlayer?.emoji : undefined}
       />
