@@ -1,4 +1,5 @@
-export type VoteValue = 1 | 2 | 3 | 5 | 8 | 13 | 21 | 'pass' | '?';
+export type NumericVoteValue = 1 | 2 | 3 | 5 | 8 | 13 | 21;
+export type VoteValue = NumericVoteValue | 'pass' | '?';
 
 export interface Player {
   id: string;

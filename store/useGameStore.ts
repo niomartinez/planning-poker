@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Player, VoteValue, GameState } from '@/types';
+import { Player, VoteValue, NumericVoteValue, GameState } from '@/types';
 
 interface GameStore extends GameState {
   addPlayer: (name: string) => string;
@@ -63,9 +63,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   getResults: () => {
     const { players } = get();
-    const numericVotes = players
-      .map((p) => p.vote)
-      .filter((v): v is number => typeof v === 'number');
+    const votes = players.map((p) => p.vote).filter((v): v is VoteValue => v !== null);
+    const numericVotes = votes.filter((v): v is NumericVoteValue => typeof v === 'number');
 
     const distribution: Record<string, number> = {};
     players.forEach((p) => {
