@@ -274,11 +274,11 @@ export default function RoomPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col gap-2 md:gap-3 min-h-0">
+        <div className="flex-1 flex flex-col justify-center min-h-0">
 
           {/* Poker Table - Compact */}
           {roomState.players.length > 0 ? (
-            <div className="flex-1 flex items-center justify-center min-h-0">
+            <div className="flex items-center justify-center">
               <PokerTable
                 players={roomState.players}
                 currentPlayerId={currentPlayerId}
@@ -324,7 +324,7 @@ export default function RoomPage() {
           )}
 
           {/* Voting Cards + Action Button - Bottom */}
-          <div className="shrink-0 space-y-2 relative z-10">
+          <div className="shrink-0 space-y-1 relative z-10 mt-2">
             {currentPlayer && !roomState.isRevealed && (
               <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
                 {VOTE_OPTIONS.map((value) => (
