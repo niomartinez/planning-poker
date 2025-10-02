@@ -1,0 +1,4 @@
+{
+  "name": "planning-poker",
+  "main": "party/server.ts"
+}

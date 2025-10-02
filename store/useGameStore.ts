@@ -23,6 +23,19 @@ interface GameStore extends GameState {
 
 const generateId = () => Math.random().toString(36).substring(7);
 
+// Broadcast changes to other tabs
+const broadcastChange = (roomCode: string) => {
+  if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+    try {
+      const channel = new BroadcastChannel('planning-poker-sync');
+      channel.postMessage({ type: 'room-update', roomCode });
+      channel.close();
+    } catch (e) {
+      // BroadcastChannel not supported
+    }
+  }
+};
+
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({

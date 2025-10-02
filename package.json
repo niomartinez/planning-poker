@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "party": "partykit dev",
+    "dev:all": "concurrently \"npm run dev\" \"npm run party\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -13,6 +15,8 @@
     "clsx": "^2.1.0",
     "lucide-react": "^0.344.0",
     "next": "^15.0.0",
+    "partykit": "^0.0.115",
+    "partysocket": "^1.1.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.2.1",
@@ -24,6 +28,7 @@
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.17",
+    "concurrently": "^9.2.1",
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.4.33",

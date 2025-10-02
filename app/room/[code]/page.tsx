@@ -5,8 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-import { useGameStore } from '@/store/useGameStore';
-import { VoteValue } from '@/types';
+import { usePartyRoom } from '@/hooks/usePartyRoom';
+import { VoteValue, NumericVoteValue } from '@/types';
 import { NameDialog } from '@/components/NameDialog';
 import { VotingCard } from '@/components/VotingCard';
 import { PokerTable } from '@/components/PokerTable';
@@ -26,49 +26,122 @@ export default function RoomPage() {
   const [showNameDialog, setShowNameDialog] = useState(false);
   const [editingName, setEditingName] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
+  const [currentPlayerName, setCurrentPlayerName] = useState<string | null>(null);
+  const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
 
-  const {
-    currentPlayerId,
-    currentPlayerName,
-    currentPlayerEmoji,
-    createRoom,
-    joinRoom,
-    setCurrentPlayer,
-    castVote,
-    sendEmote,
-    revealVotes,
-    resetVotes,
-    getResults,
-    getRoomState,
-    updatePlayerName,
-  } = useGameStore();
+  const { roomState, sendMessage } = usePartyRoom(roomCode);
 
-  const roomState = getRoomState(roomCode);
   const currentPlayer = roomState?.players.find((p) => p.id === currentPlayerId);
   const allVoted = roomState && roomState.players.length > 0 && roomState.players.every((p) => p.hasVoted);
-  const results = roomState?.isRevealed ? getResults(roomCode) : { average: null, majority: null, distribution: {} };
+
+  // Calculate results
+  const getResults = () => {
+    if (!roomState?.isRevealed) {
+      return { average: null, majority: null, distribution: {} };
+    }
+
+    const votes = roomState.players.map((p) => p.vote).filter((v): v is VoteValue => v !== null);
+    const numericVotes = votes.filter((v): v is NumericVoteValue => typeof v === 'number');
+
+    const distribution = votes.reduce((acc, vote) => {
+      const key = String(vote);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const average = numericVotes.length > 0
+      ? numericVotes.reduce((sum, v) => sum + v, 0) / numericVotes.length
+      : null;
+
+    const majorityEntry = Object.entries(distribution).sort(([, a], [, b]) => b - a)[0];
+    const majority = majorityEntry ? majorityEntry[0] : null;
+
+    return { average, majority, distribution };
+  };
+
+  const results = getResults();
 
   useEffect(() => {
-    // Create room if it doesn't exist
-    if (!roomState) {
-      createRoom(roomCode);
-    }
+    // Load player info from localStorage
+    const savedPlayerId = localStorage.getItem(`player_${roomCode}_id`);
+    const savedPlayerName = localStorage.getItem(`player_${roomCode}_name`);
+    const savedPlayerEmoji = localStorage.getItem(`player_${roomCode}_emoji`);
 
-    // Show name dialog if player hasn't joined yet
-    if (!currentPlayerId || !currentPlayer) {
+    if (savedPlayerId && savedPlayerName && savedPlayerEmoji) {
+      setCurrentPlayerId(savedPlayerId);
+      setCurrentPlayerName(savedPlayerName);
+      setCurrentPlayerEmoji(savedPlayerEmoji);
+    } else {
       setShowNameDialog(true);
     }
-  }, [roomState, currentPlayerId, currentPlayer, roomCode, createRoom]);
+  }, [roomCode]);
+
+  useEffect(() => {
+    // Auto-join room when player info is available but not in room
+    if (currentPlayerId && currentPlayerName && currentPlayerEmoji && roomState) {
+      const playerInRoom = roomState.players.find((p) => p.id === currentPlayerId);
+      if (!playerInRoom) {
+        sendMessage({
+          type: 'join',
+          player: {
+            id: currentPlayerId,
+            name: currentPlayerName,
+            emoji: currentPlayerEmoji,
+            vote: null,
+            hasVoted: false,
+          },
+        });
+      }
+    }
+  }, [currentPlayerId, currentPlayerName, currentPlayerEmoji, roomState, sendMessage]);
+
+  useEffect(() => {
+    // Show name dialog if player hasn't set their info
+    if (!currentPlayerId && roomState) {
+      setShowNameDialog(true);
+    }
+  }, [currentPlayerId, roomState]);
 
   const handleNameSubmit = (name: string, emoji: string) => {
     if (!currentPlayer) {
       // New player joining
-      const playerId = joinRoom(roomCode, name, emoji);
-      setCurrentPlayer(playerId, name, emoji);
+      const playerId = crypto.randomUUID();
+
+      // Save to localStorage
+      localStorage.setItem(`player_${roomCode}_id`, playerId);
+      localStorage.setItem(`player_${roomCode}_name`, name);
+      localStorage.setItem(`player_${roomCode}_emoji`, emoji);
+
+      setCurrentPlayerId(playerId);
+      setCurrentPlayerName(name);
+      setCurrentPlayerEmoji(emoji);
+
+      // Send join message to server
+      sendMessage({
+        type: 'join',
+        player: {
+          id: playerId,
+          name,
+          emoji,
+          vote: null,
+          hasVoted: false,
+        },
+      });
     } else {
       // Existing player updating name
-      updatePlayerName(roomCode, currentPlayerId!, name, emoji);
-      setCurrentPlayer(currentPlayerId!, name, emoji);
+      localStorage.setItem(`player_${roomCode}_name`, name);
+      localStorage.setItem(`player_${roomCode}_emoji`, emoji);
+
+      setCurrentPlayerName(name);
+      setCurrentPlayerEmoji(emoji);
+
+      sendMessage({
+        type: 'updateName',
+        playerId: currentPlayerId,
+        name,
+        emoji,
+      });
     }
     setShowNameDialog(false);
     setEditingName(false);
@@ -76,24 +149,32 @@ export default function RoomPage() {
 
   const handleEmote = (emote: string) => {
     if (currentPlayerId) {
-      sendEmote(roomCode, currentPlayerId, emote);
+      sendMessage({
+        type: 'emote',
+        playerId: currentPlayerId,
+        emote,
+      });
     }
   };
 
   const handleVote = (vote: VoteValue) => {
     if (currentPlayerId && roomState && !roomState.isRevealed) {
-      castVote(roomCode, currentPlayerId, vote);
+      sendMessage({
+        type: 'vote',
+        playerId: currentPlayerId,
+        vote,
+      });
     }
   };
 
   const handleReveal = () => {
     if (allVoted) {
-      revealVotes(roomCode);
+      sendMessage({ type: 'reveal' });
     }
   };
 
   const handleReset = () => {
-    resetVotes(roomCode);
+    sendMessage({ type: 'reset' });
   };
 
   const handleEditName = () => {
@@ -115,11 +196,23 @@ export default function RoomPage() {
   };
 
   const handleLeaveRoom = () => {
+    if (currentPlayerId) {
+      sendMessage({
+        type: 'leave',
+        playerId: currentPlayerId,
+      });
+    }
     router.push('/');
   };
 
   if (!roomState) {
-    return null;
+    return (
+      <main className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center">
+        <Card className="p-8 text-center">
+          <p className="text-xl font-semibold">Connecting to room...</p>
+        </Card>
+      </main>
+    );
   }
 
   return (
