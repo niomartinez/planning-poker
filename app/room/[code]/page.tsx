@@ -9,7 +9,8 @@ import { useGameStore } from '@/store/useGameStore';
 import { VoteValue } from '@/types';
 import { NameDialog } from '@/components/NameDialog';
 import { VotingCard } from '@/components/VotingCard';
-import { PlayerCard } from '@/components/PlayerCard';
+import { PokerTable } from '@/components/PokerTable';
+import { EmotePicker } from '@/components/EmotePicker';
 import { Results } from '@/components/Results';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -29,10 +30,12 @@ export default function RoomPage() {
   const {
     currentPlayerId,
     currentPlayerName,
+    currentPlayerEmoji,
     createRoom,
     joinRoom,
     setCurrentPlayer,
     castVote,
+    sendEmote,
     revealVotes,
     resetVotes,
     getResults,
@@ -57,18 +60,24 @@ export default function RoomPage() {
     }
   }, [roomState, currentPlayerId, currentPlayer, roomCode, createRoom]);
 
-  const handleNameSubmit = (name: string) => {
+  const handleNameSubmit = (name: string, emoji: string) => {
     if (!currentPlayer) {
       // New player joining
-      const playerId = joinRoom(roomCode, name);
-      setCurrentPlayer(playerId, name);
+      const playerId = joinRoom(roomCode, name, emoji);
+      setCurrentPlayer(playerId, name, emoji);
     } else {
       // Existing player updating name
-      updatePlayerName(roomCode, currentPlayerId!, name);
-      setCurrentPlayer(currentPlayerId!, name);
+      updatePlayerName(roomCode, currentPlayerId!, name, emoji);
+      setCurrentPlayer(currentPlayerId!, name, emoji);
     }
     setShowNameDialog(false);
     setEditingName(false);
+  };
+
+  const handleEmote = (emote: string) => {
+    if (currentPlayerId) {
+      sendEmote(roomCode, currentPlayerId, emote);
+    }
   };
 
   const handleVote = (vote: VoteValue) => {
@@ -114,7 +123,7 @@ export default function RoomPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 p-4 md:p-8">
+    <main className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header with Room Info */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -128,16 +137,16 @@ export default function RoomPage() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Leave Room
             </Button>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl font-bold text-primary drop-shadow-lg">
               Planning Poker
             </h1>
           </div>
 
-          <Card className="p-4 bg-card/50 backdrop-blur">
+          <Card className="p-4 bg-card/80 backdrop-blur border-2 border-primary/20 shadow-xl">
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">Room Code</p>
               <div className="flex gap-2">
-                <code className="text-2xl font-bold font-mono tracking-wider bg-secondary px-4 py-2 rounded">
+                <code className="text-2xl font-bold font-mono tracking-wider bg-primary/20 text-primary px-4 py-2 rounded border-2 border-primary/40">
                   {roomCode}
                 </code>
                 <Button
@@ -163,30 +172,38 @@ export default function RoomPage() {
 
         {/* Current Player Info */}
         {currentPlayer && (
-          <Card className="p-4 bg-card/50 backdrop-blur">
+          <Card className="p-4 bg-card/80 backdrop-blur border-2 border-primary/20 shadow-xl">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Playing as</p>
-                <p className="text-xl font-semibold">{currentPlayer.name}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 text-4xl flex items-center justify-center">
+                  {currentPlayer.emoji}
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Playing as</p>
+                  <p className="text-xl font-semibold">{currentPlayer.name}</p>
+                </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEditName}
-                className="gap-2"
-              >
-                <Edit2 className="w-4 h-4" />
-                Change Name
-              </Button>
+              <div className="flex gap-2">
+                <EmotePicker onEmote={handleEmote} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEditName}
+                  className="gap-2"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Change
+                </Button>
+              </div>
             </div>
           </Card>
         )}
 
         {/* Voting Cards */}
         {currentPlayer && !roomState.isRevealed && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Cast Your Vote</h2>
-            <div className="flex flex-wrap justify-center gap-4">
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-center text-primary drop-shadow">Choose your card 👇</h2>
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
               {VOTE_OPTIONS.map((value) => (
                 <VotingCard
                   key={value}
@@ -199,29 +216,33 @@ export default function RoomPage() {
           </div>
         )}
 
-        {/* Players Grid */}
+        {/* Poker Table */}
         {roomState.players.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">
-              Players ({roomState.players.length})
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {roomState.players.map((player) => (
-                <PlayerCard
-                  key={player.id}
-                  player={player}
-                  isRevealed={roomState.isRevealed}
-                  isCurrentPlayer={player.id === currentPlayerId}
-                />
-              ))}
-            </div>
+          <div className="space-y-6">
+            <PokerTable
+              players={roomState.players}
+              currentPlayerId={currentPlayerId}
+              isRevealed={roomState.isRevealed}
+              centerContent={
+                <div className="text-center space-y-4">
+                  <h3 className="text-2xl font-bold text-foreground/80">
+                    {roomState.players.length} {roomState.players.length === 1 ? 'Player' : 'Players'}
+                  </h3>
+                  {!roomState.isRevealed && (
+                    <p className="text-sm text-muted-foreground">
+                      {allVoted ? 'All votes are in!' : 'Waiting for votes...'}
+                    </p>
+                  )}
+                </div>
+              }
+            />
           </div>
         )}
 
         {/* Results */}
         {roomState.isRevealed && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold text-center">Results</h2>
+          <div className="space-y-6">
+            <h2 className="text-3xl font-bold text-center text-primary drop-shadow">🎯 Results</h2>
             <Results
               average={results.average}
               majority={results.majority}
@@ -259,11 +280,14 @@ export default function RoomPage() {
 
         {/* Empty State */}
         {roomState.players.length === 0 && (
-          <Card className="p-8 text-center">
+          <Card className="p-12 text-center bg-card/80 backdrop-blur border-2 border-dashed border-primary/40">
+            <p className="text-xl font-semibold text-foreground mb-2">
+              🎲 Table is empty
+            </p>
             <p className="text-lg text-muted-foreground">
               Waiting for players to join...
             </p>
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-muted-foreground mt-3">
               Share the room code or link with your team
             </p>
           </Card>
@@ -275,6 +299,7 @@ export default function RoomPage() {
         open={showNameDialog}
         onSubmit={handleNameSubmit}
         currentName={editingName ? currentPlayer?.name : ''}
+        currentEmoji={editingName ? currentPlayer?.emoji : undefined}
       />
     </main>
   );

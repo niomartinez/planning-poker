@@ -6,6 +6,8 @@ export interface Player {
   name: string;
   vote: VoteValue | null;
   hasVoted: boolean;
+  emoji: string;
+  currentEmote?: string | null;
 }
 
 export interface RoomState {

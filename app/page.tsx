@@ -41,14 +41,14 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/20 flex items-center justify-center p-4">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary to-green-400 bg-clip-text text-transparent">
-            Planning Poker
+          <h1 className="text-5xl md:text-6xl font-bold text-primary drop-shadow-2xl">
+            🃏 Planning Poker
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-foreground/90 text-xl font-medium drop-shadow">
             Agile Estimation Made Simple
           </p>
         </div>
@@ -56,20 +56,20 @@ export default function Home() {
         {/* Options */}
         <div className="grid md:grid-cols-2 gap-6">
           {/* Create Room */}
-          <Card className="hover:border-primary/50 transition-colors">
+          <Card className="bg-card/80 backdrop-blur border-2 border-primary/20 hover:border-primary/50 transition-all shadow-xl hover:shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Plus className="w-6 h-6 text-primary" />
                 Create Room
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base">
                 Start a new planning poker session
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button
                 onClick={handleCreateRoom}
-                className="w-full"
+                className="w-full text-lg font-semibold"
                 size="lg"
               >
                 Create New Room
@@ -78,13 +78,13 @@ export default function Home() {
           </Card>
 
           {/* Join Room */}
-          <Card className="hover:border-primary/50 transition-colors">
+          <Card className="bg-card/80 backdrop-blur border-2 border-primary/20 hover:border-primary/50 transition-all shadow-xl hover:shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Users className="w-6 h-6 text-primary" />
                 Join Room
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-base">
                 Enter a room code to join
               </CardDescription>
             </CardHeader>
@@ -105,7 +105,7 @@ export default function Home() {
                 )}
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full text-lg font-semibold"
                   size="lg"
                   variant="secondary"
                 >

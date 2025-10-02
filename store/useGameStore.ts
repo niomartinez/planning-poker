@@ -3,12 +3,14 @@ import { persist } from 'zustand/middleware';
 import { Player, VoteValue, NumericVoteValue, GameState, RoomState } from '@/types';
 
 interface GameStore extends GameState {
+  currentPlayerEmoji: string | null;
   createRoom: (roomCode: string) => void;
-  joinRoom: (roomCode: string, playerName: string) => string;
+  joinRoom: (roomCode: string, playerName: string, emoji: string) => string;
   leaveRoom: (roomCode: string, playerId: string) => void;
-  updatePlayerName: (roomCode: string, playerId: string, name: string) => void;
-  setCurrentPlayer: (id: string, name: string) => void;
+  updatePlayerName: (roomCode: string, playerId: string, name: string, emoji: string) => void;
+  setCurrentPlayer: (id: string, name: string, emoji: string) => void;
   castVote: (roomCode: string, playerId: string, vote: VoteValue) => void;
+  sendEmote: (roomCode: string, playerId: string, emote: string) => void;
   revealVotes: (roomCode: string) => void;
   resetVotes: (roomCode: string) => void;
   getResults: (roomCode: string) => {
@@ -27,6 +29,7 @@ export const useGameStore = create<GameStore>()(
       rooms: {},
       currentPlayerId: null,
       currentPlayerName: null,
+      currentPlayerEmoji: null,
 
       createRoom: (roomCode: string) => {
         set((state) => ({
@@ -40,7 +43,7 @@ export const useGameStore = create<GameStore>()(
         }));
       },
 
-      joinRoom: (roomCode: string, playerName: string) => {
+      joinRoom: (roomCode: string, playerName: string, emoji: string) => {
         const id = generateId();
         set((state) => {
           const room = state.rooms[roomCode];
@@ -51,7 +54,7 @@ export const useGameStore = create<GameStore>()(
               ...state.rooms,
               [roomCode]: {
                 ...room,
-                players: [...room.players, { id, name: playerName, vote: null, hasVoted: false }],
+                players: [...room.players, { id, name: playerName, vote: null, hasVoted: false, emoji, currentEmote: null }],
               },
             },
           };
@@ -75,7 +78,7 @@ export const useGameStore = create<GameStore>()(
           };
         }),
 
-      updatePlayerName: (roomCode: string, playerId: string, name: string) =>
+      updatePlayerName: (roomCode: string, playerId: string, name: string, emoji: string) =>
         set((state) => {
           const room = state.rooms[roomCode];
           if (!room) return state;
@@ -86,15 +89,54 @@ export const useGameStore = create<GameStore>()(
               [roomCode]: {
                 ...room,
                 players: room.players.map((p) =>
-                  p.id === playerId ? { ...p, name } : p
+                  p.id === playerId ? { ...p, name, emoji } : p
                 ),
               },
             },
           };
         }),
 
-      setCurrentPlayer: (id: string, name: string) =>
-        set({ currentPlayerId: id, currentPlayerName: name }),
+      setCurrentPlayer: (id: string, name: string, emoji: string) =>
+        set({ currentPlayerId: id, currentPlayerName: name, currentPlayerEmoji: emoji }),
+
+      sendEmote: (roomCode: string, playerId: string, emote: string) => {
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
+
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: room.players.map((p) =>
+                  p.id === playerId ? { ...p, currentEmote: emote } : p
+                ),
+              },
+            },
+          };
+        });
+
+        // Clear emote after 3 seconds
+        setTimeout(() => {
+          set((state) => {
+            const room = state.rooms[roomCode];
+            if (!room) return state;
+
+            return {
+              rooms: {
+                ...state.rooms,
+                [roomCode]: {
+                  ...room,
+                  players: room.players.map((p) =>
+                    p.id === playerId ? { ...p, currentEmote: null } : p
+                  ),
+                },
+              },
+            };
+          });
+        }, 3000);
+      },
 
       castVote: (roomCode: string, playerId: string, vote: VoteValue) =>
         set((state) => {

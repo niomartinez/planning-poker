@@ -1,9 +1,8 @@
 'use client';
 
 import { Player } from '@/types';
-import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Loader2, Coffee, HelpCircle, User } from 'lucide-react';
+import { Loader2, Coffee, HelpCircle } from 'lucide-react';
 
 interface PlayerCardProps {
   player: Player;
@@ -14,54 +13,76 @@ interface PlayerCardProps {
 export function PlayerCard({ player, isRevealed, isCurrentPlayer }: PlayerCardProps) {
   const renderVote = () => {
     if (!player.hasVoted) {
-      return <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />;
+      return (
+        <div className="w-14 h-20 rounded-lg bg-secondary/50 border-2 border-dashed border-muted flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      );
     }
 
     if (!isRevealed) {
       return (
-        <div className="w-12 h-16 bg-primary/20 border-2 border-primary rounded-lg flex items-center justify-center">
-          <span className="text-2xl">🃏</span>
+        <div className="w-14 h-20 poker-card rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-blue-300">
+          <span className="text-3xl">🂠</span>
         </div>
       );
     }
 
     if (player.vote === 'pass') {
       return (
-        <div className="w-12 h-16 bg-card border-2 border-border rounded-lg flex items-center justify-center">
-          <Coffee className="w-6 h-6" />
+        <div className="w-14 h-20 poker-card rounded-lg flex items-center justify-center">
+          <Coffee className="w-7 h-7 text-amber-700" />
         </div>
       );
     }
 
     if (player.vote === '?') {
       return (
-        <div className="w-12 h-16 bg-card border-2 border-border rounded-lg flex items-center justify-center">
-          <HelpCircle className="w-6 h-6" />
+        <div className="w-14 h-20 poker-card rounded-lg flex items-center justify-center">
+          <HelpCircle className="w-7 h-7 text-blue-600" />
         </div>
       );
     }
 
     return (
-      <div className="w-12 h-16 bg-primary border-2 border-primary rounded-lg flex items-center justify-center">
-        <span className="text-xl font-bold text-primary-foreground">{player.vote}</span>
+      <div className="w-14 h-20 poker-card rounded-lg flex items-center justify-center relative">
+        <div className="absolute top-1 left-1 text-xs font-bold text-gray-600">{player.vote}</div>
+        <span className="text-2xl font-bold text-gray-800">{player.vote}</span>
+        <div className="absolute bottom-1 right-1 text-xs font-bold text-gray-600 rotate-180">{player.vote}</div>
       </div>
     );
   };
 
   return (
-    <Card
+    <div
       className={cn(
-        'p-4 flex flex-col items-center gap-3 transition-all',
-        isCurrentPlayer && 'ring-2 ring-primary'
+        'relative flex flex-col items-center gap-2 p-3 rounded-xl transition-all',
+        'bg-card/80 backdrop-blur-sm border-2',
+        isCurrentPlayer ? 'border-primary shadow-lg shadow-primary/20' : 'border-border/50'
       )}
     >
-      <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-        <User className="w-5 h-5" />
+      {/* Emote display */}
+      {player.currentEmote && (
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-4xl animate-bounce z-10">
+          {player.currentEmote}
+        </div>
+      )}
+
+      {/* Avatar */}
+      <div className="relative w-16 h-16 text-5xl flex items-center justify-center">
+        {player.emoji}
+        {isCurrentPlayer && (
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-card" />
+        )}
       </div>
-      <div className="text-sm font-medium text-center truncate max-w-full">
+
+      {/* Name */}
+      <div className="text-sm font-semibold text-center truncate max-w-full px-2">
         {player.name}
       </div>
+
+      {/* Vote */}
       {renderVote()}
-    </Card>
+    </div>
   );
 }
