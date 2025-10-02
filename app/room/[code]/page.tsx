@@ -217,176 +217,161 @@ export default function RoomPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header with Room Info */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
+    <main className="h-screen bg-background overflow-hidden flex flex-col p-2 md:p-4">
+      <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-2 md:gap-3">
+        {/* Compact Header */}
+        <div className="flex justify-between items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLeaveRoom}
-              className="mb-2 -ml-2"
+              className="h-8 px-2"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Leave Room
+              <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 md:mr-1" />
+              <span className="hidden md:inline text-xs">Leave</span>
             </Button>
-            <h1 className="text-4xl md:text-5xl font-bold text-primary drop-shadow-lg">
-              Planning Poker
-            </h1>
+            <h1 className="text-lg md:text-2xl font-bold text-primary">Planning Poker</h1>
           </div>
 
-          <Card className="p-4 bg-card/80 backdrop-blur border-2 border-primary/20 shadow-xl">
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Room Code</p>
-              <div className="flex gap-2">
-                <code className="text-2xl font-bold font-mono tracking-wider bg-primary/20 text-primary px-4 py-2 rounded border-2 border-primary/40">
-                  {roomCode}
-                </code>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopyCode}
-                  className="shrink-0"
-                >
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopyLink}
-                  className="shrink-0"
-                >
-                  <Share2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Current Player Info */}
-        {currentPlayer && (
-          <Card className="p-4 bg-card/80 backdrop-blur border-2 border-primary/20 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 text-4xl flex items-center justify-center">
-                  {currentPlayer.emoji}
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Playing as</p>
-                  <p className="text-xl font-semibold">{currentPlayer.name}</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            {/* Current Player Info - Inline */}
+            {currentPlayer && (
+              <div className="flex items-center gap-2 bg-card/80 border border-primary/20 rounded-lg px-2 py-1">
+                <div className="text-xl md:text-2xl">{currentPlayer.emoji}</div>
+                <span className="text-xs md:text-sm font-semibold hidden sm:inline">{currentPlayer.name}</span>
                 <EmotePicker onEmote={handleEmote} />
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
                   onClick={handleEditName}
-                  className="gap-2"
+                  className="h-7 w-7 p-0"
                 >
-                  <Edit2 className="w-4 h-4" />
-                  Change
+                  <Edit2 className="w-3 h-3" />
                 </Button>
               </div>
-            </div>
-          </Card>
-        )}
+            )}
 
-        {/* Voting Cards */}
-        {currentPlayer && !roomState.isRevealed && (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center text-primary drop-shadow">Choose your card 👇</h2>
-            <div className="flex flex-wrap justify-center gap-3 md:gap-4">
-              {VOTE_OPTIONS.map((value) => (
-                <VotingCard
-                  key={value}
-                  value={value}
-                  selected={currentPlayer.vote === value}
-                  onClick={() => handleVote(value)}
-                />
-              ))}
+            {/* Room Code */}
+            <div className="flex items-center gap-1 bg-card/80 border border-primary/20 rounded-lg px-2 py-1">
+              <code className="text-sm md:text-lg font-bold font-mono text-primary">
+                {roomCode}
+              </code>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyCode}
+                className="h-7 w-7 p-0"
+              >
+                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopyLink}
+                className="h-7 w-7 p-0"
+              >
+                <Share2 className="w-3 h-3" />
+              </Button>
             </div>
           </div>
-        )}
+        </div>
 
-        {/* Poker Table */}
-        {roomState.players.length > 0 && (
-          <div className="space-y-6">
-            <PokerTable
-              players={roomState.players}
-              currentPlayerId={currentPlayerId}
-              isRevealed={roomState.isRevealed}
-              centerContent={
-                <div className="text-center space-y-4">
-                  <h3 className="text-2xl font-bold text-foreground/80">
-                    {roomState.players.length} {roomState.players.length === 1 ? 'Player' : 'Players'}
-                  </h3>
-                  {!roomState.isRevealed && (
-                    <p className="text-sm text-muted-foreground">
-                      {allVoted ? 'All votes are in!' : 'Waiting for votes...'}
-                    </p>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col gap-2 md:gap-3 min-h-0">
+
+          {/* Poker Table - Compact */}
+          {roomState.players.length > 0 ? (
+            <div className="flex-1 flex items-center justify-center min-h-0">
+              <PokerTable
+                players={roomState.players}
+                currentPlayerId={currentPlayerId}
+                isRevealed={roomState.isRevealed}
+                centerContent={
+                  <div className="text-center">
+                    {roomState.isRevealed ? (
+                      <div className="space-y-1">
+                        <div className="text-xs text-muted-foreground mb-1">Results</div>
+                        {results.average !== null && (
+                          <div className="text-2xl md:text-3xl font-bold text-primary">
+                            Avg: {results.average.toFixed(1)}
+                          </div>
+                        )}
+                        {results.majority && (
+                          <div className="text-lg md:text-xl text-foreground/80">
+                            Most: {results.majority}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="text-lg md:text-xl font-bold text-foreground/80">
+                          {roomState.players.length} {roomState.players.length === 1 ? 'Player' : 'Players'}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {allVoted ? 'Ready!' : 'Waiting...'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                }
+              />
+            </div>
+          ) : (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-foreground mb-1">🎲 Waiting for players</p>
+                <p className="text-xs text-muted-foreground">Share the room code</p>
+              </div>
+            </div>
+          )}
+
+          {/* Voting Cards + Action Button - Bottom */}
+          {currentPlayer && (
+            <div className="shrink-0 space-y-2">
+              {!roomState.isRevealed && (
+                <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
+                  {VOTE_OPTIONS.map((value) => (
+                    <VotingCard
+                      key={value}
+                      value={value}
+                      selected={currentPlayer.vote === value}
+                      onClick={() => handleVote(value)}
+                      compact
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Action Button */}
+              {roomState.players.length > 0 && (
+                <div className="flex justify-center">
+                  {!roomState.isRevealed ? (
+                    <Button
+                      onClick={handleReveal}
+                      disabled={!allVoted}
+                      size="sm"
+                      className="gap-1.5 h-8"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      Reveal
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleReset}
+                      size="sm"
+                      className="gap-1.5 h-8"
+                      variant="secondary"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      New Round
+                    </Button>
                   )}
                 </div>
-              }
-            />
-          </div>
-        )}
-
-        {/* Results */}
-        {roomState.isRevealed && (
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-center text-primary drop-shadow">🎯 Results</h2>
-            <Results
-              average={results.average}
-              majority={results.majority}
-              distribution={results.distribution}
-            />
-          </div>
-        )}
-
-        {/* Action Buttons */}
-        {roomState.players.length > 0 && (
-          <div className="flex justify-center gap-4">
-            {!roomState.isRevealed ? (
-              <Button
-                onClick={handleReveal}
-                disabled={!allVoted}
-                size="lg"
-                className="gap-2"
-              >
-                <Eye className="w-5 h-5" />
-                Reveal Votes
-              </Button>
-            ) : (
-              <Button
-                onClick={handleReset}
-                size="lg"
-                className="gap-2"
-                variant="secondary"
-              >
-                <RotateCcw className="w-5 h-5" />
-                New Round
-              </Button>
-            )}
-          </div>
-        )}
-
-        {/* Empty State */}
-        {roomState.players.length === 0 && (
-          <Card className="p-12 text-center bg-card/80 backdrop-blur border-2 border-dashed border-primary/40">
-            <p className="text-xl font-semibold text-foreground mb-2">
-              🎲 Table is empty
-            </p>
-            <p className="text-lg text-muted-foreground">
-              Waiting for players to join...
-            </p>
-            <p className="text-sm text-muted-foreground mt-3">
-              Share the room code or link with your team
-            </p>
-          </Card>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
 
       {/* Name Dialog */}
       <NameDialog
