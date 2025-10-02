@@ -23,7 +23,11 @@ export default class PokerRoomServer implements Party.Server {
     // Update state based on action
     switch (data.type) {
       case 'join':
-        this.state.players.push(data.player);
+        // Only add player if they don't already exist
+        const existingPlayer = this.state.players.find((p: any) => p.id === data.player.id);
+        if (!existingPlayer) {
+          this.state.players.push(data.player);
+        }
         break;
       case 'vote':
         this.state.players = this.state.players.map((p: any) =>

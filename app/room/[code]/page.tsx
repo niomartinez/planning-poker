@@ -94,7 +94,8 @@ export default function RoomPage() {
         });
       }
     }
-  }, [currentPlayerId, currentPlayerName, currentPlayerEmoji, roomState, sendMessage]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPlayerId, currentPlayerName, currentPlayerEmoji, roomState]);
 
   useEffect(() => {
     // Show name dialog if player hasn't set their info
