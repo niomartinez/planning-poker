@@ -372,6 +372,7 @@ export default function RoomPage() {
             </div>
           )}
         </div>
+      </div>
 
       {/* Name Dialog */}
       <NameDialog
