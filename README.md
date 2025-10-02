@@ -1,55 +1,100 @@
 # Planning Poker
 
-A modern, clean Planning Poker app built with Next.js 15, TypeScript, Tailwind CSS, and shadcn/ui.
+A real-time multiplayer Planning Poker app for agile story point estimation. Built with Next.js 15, TypeScript, PartyKit WebSockets, Tailwind CSS, and shadcn/ui.
+
+## What is Planning Poker?
+
+Planning Poker is a collaborative estimation technique used by agile teams to size user stories. Team members vote on story points using Fibonacci numbers, discuss differences, and reach consensus. This app provides a real-time digital version that syncs instantly across all connected players.
 
 ## Features
+
+### Real-time Multiplayer
+- **WebSocket Synchronization**: Powered by PartyKit for instant updates across all players
+- **Multi-device Support**: Join the same room from different browsers/devices and see real-time updates
+- **Emote Reactions**: Send floating emote reactions that appear for all players
 
 ### Room Management
 - **Create Room**: Generate a unique 6-character room code
 - **Join Room**: Enter a room code to join an existing session
 - **Share Room**: Copy room code or full link to invite team members
-- **Persistent State**: Rooms are saved locally (localStorage)
+- **Isolated Sessions**: Each room is completely separate with its own state
 
 ### Voting Features
-- **Name Entry**: Players enter their name before joining the room
+- **Name Entry**: Players choose a name and emoji before joining
 - **Fibonacci Voting**: Vote using the Fibonacci sequence (1, 2, 3, 5, 8, 13, 21)
 - **Special Options**:
-  - ☕ **Pass** (Coffee cup): For taking a break
-  - ❓ **Question**: For voters needing clarification
-- **Real-time Status**: Shows loader icon for players who haven't voted yet
-- **Hidden Votes**: Cards are hidden until revealed (shows 🃏 for voted players)
-- **Reveal Votes**: Anyone can reveal votes once all players have voted
+  - ☕ **Pass** (Coffee cup): Skip this vote
+  - ❓ **Question**: Need clarification before voting
+- **Real-time Status**: See which players have voted (loader icon for pending)
+- **Hidden Votes**: Cards stay hidden until revealed (shows 🃏 for voted players)
+- **Reveal Votes**: Anyone can reveal all votes simultaneously
 - **Results**:
-  - **Average**: Calculated from numeric votes only (excludes Pass)
-  - **Majority**: Most voted option with vote count
+  - **Average**: Calculated from numeric votes only (excludes Pass/?)
+  - **Majority**: Most voted option with count
 - **Reset**: Start a new voting round
-- **Name Editing**: Players can easily change their name anytime
-- **Modern UI**: Clean, poker-themed design with smooth animations
+- **Name Editing**: Update your name/emoji anytime
+- **Modern UI**: Clean, compact single-screen design
 
 ## Getting Started
 
-Install dependencies:
+### Prerequisites
+- Node.js 20+ installed
+- npm or yarn
 
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/planning-poker.git
+cd planning-poker
+```
+
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-Run the development server:
-
+3. Set up environment variables (optional for local dev):
 ```bash
-npm run dev
+# Create .env.local (optional - defaults work for local development)
+NEXT_PUBLIC_PARTYKIT_HOST=localhost:1999
 ```
 
-Open [http://localhost:3000](http://localhost:3000) (or the port shown in terminal).
+### Running Locally
+
+**Option 1: Run everything together (recommended)**
+```bash
+npm run dev:all
+```
+This runs both the Next.js app (port 3000) and PartyKit WebSocket server (port 1999) concurrently.
+
+**Option 2: Run separately**
+```bash
+# Terminal 1: Run Next.js
+npm run dev
+
+# Terminal 2: Run PartyKit server
+npm run party
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Testing Multiplayer Locally
+
+1. Start the dev servers with `npm run dev:all`
+2. Open [http://localhost:3000](http://localhost:3000) in two different browser windows
+3. Create a room in one window
+4. Copy the room code and join from the second window
+5. Vote and see real-time synchronization!
 
 ## Tech Stack
 
-- **Next.js 15** (App Router)
-- **TypeScript**
-- **Tailwind CSS**
-- **shadcn/ui** components
-- **Zustand** for state management
-- **Lucide React** for icons
+- **Next.js 15** (App Router) - React framework
+- **TypeScript** - Type safety
+- **PartyKit** - Real-time WebSocket server
+- **Tailwind CSS** - Styling
+- **shadcn/ui** - UI components
+- **Lucide React** - Icons
 
 ## Usage
 
@@ -71,9 +116,63 @@ Open [http://localhost:3000](http://localhost:3000) (or the port shown in termin
 5. Click "New Round" to reset and vote again
 6. Click "Change Name" to update your name anytime
 
-## How Sessions Work
+## How It Works
 
-- **Separate Rooms**: Each room code creates an isolated session
-- **Local Storage**: Room data persists in your browser's localStorage
-- **No Backend**: Everything runs client-side (for now)
-- **Privacy**: Each browser maintains its own state independently
+### Architecture
+- **Next.js Frontend**: React app with App Router serving the UI
+- **PartyKit Backend**: WebSocket server handling real-time state synchronization
+- **Room Isolation**: Each 6-character room code creates a separate PartyKit room instance
+- **Player Identity**: Players are identified by UUID stored in localStorage per room
+- **Real-time Sync**: All actions (voting, revealing, resetting) broadcast immediately to all connected players
+
+### State Management
+- **Server State**: PartyKit server maintains authoritative room state (players, votes, reveal status)
+- **Client State**: React components subscribe to WebSocket updates via `usePartyRoom` hook
+- **Local Storage**: Player identity (ID, name, emoji) persists locally per room
+- **Auto-reconnect**: Players automatically rejoin when returning to a room
+
+## Deployment
+
+### Deploy Next.js App
+Deploy to Vercel, Netlify, or any Next.js-compatible host:
+```bash
+npm run build
+npm start
+```
+
+### Deploy PartyKit Server
+```bash
+npx partykit deploy
+```
+
+After deployment, update your environment variable:
+```bash
+NEXT_PUBLIC_PARTYKIT_HOST=your-project.username.partykit.dev
+```
+
+## Project Structure
+
+```
+├── app/                  # Next.js App Router
+│   ├── page.tsx         # Home page (create/join)
+│   ├── room/[code]/     # Room page (voting UI)
+│   └── layout.tsx       # Root layout
+├── party/
+│   └── server.ts        # PartyKit WebSocket server
+├── components/          # React components
+│   ├── ui/              # shadcn/ui components
+│   └── *.tsx            # Feature components
+├── hooks/
+│   └── usePartyRoom.ts  # WebSocket connection hook
+├── lib/                 # Utilities
+├── types/               # TypeScript types
+└── partykit.json        # PartyKit configuration
+```
+
+## Contributing
+
+Contributions welcome! Please open an issue or submit a pull request.
+
+## License
+
+MIT
