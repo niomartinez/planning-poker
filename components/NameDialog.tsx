@@ -17,7 +17,12 @@ export function NameDialog({ open, onSubmit, currentName = '' }: NameDialogProps
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim()) {
-      onSubmit(name.trim());
+      let finalName = name.trim();
+      // Easter egg: Ben -> Benjamin
+      if (finalName.toLowerCase() === 'ben') {
+        finalName = 'Benjamin';
+      }
+      onSubmit(finalName);
       setName('');
     }
   };

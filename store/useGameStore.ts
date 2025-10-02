@@ -1,93 +1,192 @@
 import { create } from 'zustand';
-import { Player, VoteValue, NumericVoteValue, GameState } from '@/types';
+import { persist } from 'zustand/middleware';
+import { Player, VoteValue, NumericVoteValue, GameState, RoomState } from '@/types';
 
 interface GameStore extends GameState {
-  addPlayer: (name: string) => string;
-  removePlayer: (id: string) => void;
-  updatePlayerName: (id: string, name: string) => void;
-  setCurrentPlayer: (id: string) => void;
-  castVote: (playerId: string, vote: VoteValue) => void;
-  revealVotes: () => void;
-  resetVotes: () => void;
-  getResults: () => {
+  createRoom: (roomCode: string) => void;
+  joinRoom: (roomCode: string, playerName: string) => string;
+  leaveRoom: (roomCode: string, playerId: string) => void;
+  updatePlayerName: (roomCode: string, playerId: string, name: string) => void;
+  setCurrentPlayer: (id: string, name: string) => void;
+  castVote: (roomCode: string, playerId: string, vote: VoteValue) => void;
+  revealVotes: (roomCode: string) => void;
+  resetVotes: (roomCode: string) => void;
+  getResults: (roomCode: string) => {
     average: number | null;
     majority: VoteValue | null;
     distribution: Record<string, number>;
   };
+  getRoomState: (roomCode: string) => RoomState | null;
 }
 
 const generateId = () => Math.random().toString(36).substring(7);
 
-export const useGameStore = create<GameStore>((set, get) => ({
-  players: [],
-  isRevealed: false,
-  currentPlayerId: null,
+export const useGameStore = create<GameStore>()(
+  persist(
+    (set, get) => ({
+      rooms: {},
+      currentPlayerId: null,
+      currentPlayerName: null,
 
-  addPlayer: (name: string) => {
-    const id = generateId();
-    set((state) => ({
-      players: [...state.players, { id, name, vote: null, hasVoted: false }],
-    }));
-    return id;
-  },
+      createRoom: (roomCode: string) => {
+        set((state) => ({
+          rooms: {
+            ...state.rooms,
+            [roomCode]: {
+              players: [],
+              isRevealed: false,
+            },
+          },
+        }));
+      },
 
-  removePlayer: (id: string) =>
-    set((state) => ({
-      players: state.players.filter((p) => p.id !== id),
-    })),
+      joinRoom: (roomCode: string, playerName: string) => {
+        const id = generateId();
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
 
-  updatePlayerName: (id: string, name: string) =>
-    set((state) => ({
-      players: state.players.map((p) =>
-        p.id === id ? { ...p, name } : p
-      ),
-    })),
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: [...room.players, { id, name: playerName, vote: null, hasVoted: false }],
+              },
+            },
+          };
+        });
+        return id;
+      },
 
-  setCurrentPlayer: (id: string) =>
-    set({ currentPlayerId: id }),
+      leaveRoom: (roomCode: string, playerId: string) =>
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
 
-  castVote: (playerId: string, vote: VoteValue) =>
-    set((state) => ({
-      players: state.players.map((p) =>
-        p.id === playerId ? { ...p, vote, hasVoted: true } : p
-      ),
-    })),
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: room.players.filter((p) => p.id !== playerId),
+              },
+            },
+          };
+        }),
 
-  revealVotes: () => set({ isRevealed: true }),
+      updatePlayerName: (roomCode: string, playerId: string, name: string) =>
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
 
-  resetVotes: () =>
-    set((state) => ({
-      players: state.players.map((p) => ({ ...p, vote: null, hasVoted: false })),
-      isRevealed: false,
-    })),
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: room.players.map((p) =>
+                  p.id === playerId ? { ...p, name } : p
+                ),
+              },
+            },
+          };
+        }),
 
-  getResults: () => {
-    const { players } = get();
-    const votes = players.map((p) => p.vote).filter((v): v is VoteValue => v !== null);
-    const numericVotes = votes.filter((v): v is NumericVoteValue => typeof v === 'number');
+      setCurrentPlayer: (id: string, name: string) =>
+        set({ currentPlayerId: id, currentPlayerName: name }),
 
-    const distribution: Record<string, number> = {};
-    players.forEach((p) => {
-      if (p.vote !== null) {
-        const key = String(p.vote);
-        distribution[key] = (distribution[key] || 0) + 1;
-      }
-    });
+      castVote: (roomCode: string, playerId: string, vote: VoteValue) =>
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
 
-    const average =
-      numericVotes.length > 0
-        ? numericVotes.reduce((a, b) => a + b, 0) / numericVotes.length
-        : null;
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: room.players.map((p) =>
+                  p.id === playerId ? { ...p, vote, hasVoted: true } : p
+                ),
+              },
+            },
+          };
+        }),
 
-    let majority: VoteValue | null = null;
-    let maxCount = 0;
-    Object.entries(distribution).forEach(([vote, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        majority = vote === 'pass' || vote === '?' ? vote : Number(vote) as VoteValue;
-      }
-    });
+      revealVotes: (roomCode: string) =>
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
 
-    return { average, majority, distribution };
-  },
-}));
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                isRevealed: true,
+              },
+            },
+          };
+        }),
+
+      resetVotes: (roomCode: string) =>
+        set((state) => {
+          const room = state.rooms[roomCode];
+          if (!room) return state;
+
+          return {
+            rooms: {
+              ...state.rooms,
+              [roomCode]: {
+                ...room,
+                players: room.players.map((p) => ({ ...p, vote: null, hasVoted: false })),
+                isRevealed: false,
+              },
+            },
+          };
+        }),
+
+      getResults: (roomCode: string) => {
+        const room = get().rooms[roomCode];
+        if (!room) {
+          return { average: null, majority: null, distribution: {} };
+        }
+
+        const votes = room.players.map((p) => p.vote).filter((v): v is VoteValue => v !== null);
+        const numericVotes = votes.filter((v): v is NumericVoteValue => typeof v === 'number');
+
+        const distribution: Record<string, number> = {};
+        room.players.forEach((p) => {
+          if (p.vote !== null) {
+            const key = String(p.vote);
+            distribution[key] = (distribution[key] || 0) + 1;
+          }
+        });
+
+        const average =
+          numericVotes.length > 0
+            ? numericVotes.reduce((a, b) => a + b, 0) / numericVotes.length
+            : null;
+
+        let majority: VoteValue | null = null;
+        let maxCount = 0;
+        Object.entries(distribution).forEach(([vote, count]) => {
+          if (count > maxCount) {
+            maxCount = count;
+            majority = vote === 'pass' || vote === '?' ? vote : Number(vote) as VoteValue;
+          }
+        });
+
+        return { average, majority, distribution };
+      },
+
+      getRoomState: (roomCode: string) => {
+        return get().rooms[roomCode] || null;
+      },
+    }),
+    {
+      name: 'planning-poker-storage',
+    }
+  )
+);

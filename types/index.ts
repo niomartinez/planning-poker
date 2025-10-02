@@ -8,8 +8,13 @@ export interface Player {
   hasVoted: boolean;
 }
 
-export interface GameState {
+export interface RoomState {
   players: Player[];
   isRevealed: boolean;
+}
+
+export interface GameState {
+  rooms: Record<string, RoomState>;
   currentPlayerId: string | null;
+  currentPlayerName: string | null;
 }
