@@ -236,8 +236,8 @@ export default function RoomPage() {
   }
 
   return (
-    <main className="h-screen bg-background overflow-hidden flex flex-col p-2 md:p-4">
-      <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-2 md:gap-3">
+    <main className="h-screen bg-background overflow-hidden flex flex-col p-2 md:p-3">
+      <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-1.5 md:gap-2">
         {/* Compact Header */}
         <div className="flex justify-between items-center gap-2 shrink-0 relative z-30">
           <div className="flex items-center gap-2">
@@ -296,11 +296,11 @@ export default function RoomPage() {
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col justify-center min-h-0">
+        <div className="flex-1 flex flex-col justify-center items-center min-h-0 py-2">
 
           {/* Poker Table - Compact */}
           {roomState.players.length > 0 ? (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center w-full">
               <PokerTable
                 players={roomState.players}
                 currentPlayerId={currentPlayerId}
@@ -346,7 +346,7 @@ export default function RoomPage() {
           )}
 
           {/* Voting Cards + Action Button - Bottom */}
-          <div className="shrink-0 space-y-1 relative z-10 mt-2">
+          <div className="shrink-0 space-y-1 relative z-10 pb-1">
             {currentPlayer && !roomState.isRevealed && (
               <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
                 {VOTE_OPTIONS.map((value) => (
