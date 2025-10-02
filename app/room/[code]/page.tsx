@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
+
 import { useGameStore } from '@/store/useGameStore';
 import { VoteValue } from '@/types';
 import { NameDialog } from '@/components/NameDialog';
