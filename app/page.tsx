@@ -88,7 +88,7 @@ export default function Home() {
             <CardContent>
               <form onSubmit={handleJoinRoom} className="space-y-4">
                 <Input
-                  placeholder="Enter room code (e.g., ABC123)"
+                  placeholder="Enter room code"
                   value={roomCode}
                   onChange={(e) => {
                     setRoomCode(e.target.value.toUpperCase());
