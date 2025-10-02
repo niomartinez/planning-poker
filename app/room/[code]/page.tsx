@@ -237,9 +237,9 @@ export default function RoomPage() {
 
   return (
     <main className="h-screen bg-background overflow-hidden flex flex-col p-2 md:p-3">
-      <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-1.5 md:gap-2">
+      <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
         {/* Compact Header */}
-        <div className="flex justify-between items-center gap-2 shrink-0 relative z-30">
+        <div className="flex justify-between items-center gap-2 shrink-0 relative z-30 mb-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -295,46 +295,48 @@ export default function RoomPage() {
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col justify-center items-center min-h-0 py-2">
+        {/* Main Content - Centered */}
+        <div className="flex-1 flex flex-col justify-center items-center min-h-0">
 
-          {/* Poker Table - Compact */}
+          {/* Poker Table */}
           {roomState.players.length > 0 ? (
-            <div className="flex items-center justify-center w-full">
-              <PokerTable
-                players={roomState.players}
-                currentPlayerId={currentPlayerId}
-                isRevealed={roomState.isRevealed}
-                onEmote={handleEmote}
-                centerContent={
-                  <div className="text-center">
-                    {roomState.isRevealed ? (
-                      <div className="space-y-1">
-                        <div className="text-xs text-muted-foreground mb-1">Results</div>
-                        {results.average !== null && (
-                          <div className="text-2xl md:text-3xl font-bold text-primary">
-                            Avg: {results.average.toFixed(1)}
-                          </div>
-                        )}
-                        {results.majority && (
-                          <div className="text-lg md:text-xl text-foreground/80">
-                            Most: {results.majority}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div>
-                        <div className="text-lg md:text-xl font-bold text-foreground/80">
-                          {roomState.players.length} {roomState.players.length === 1 ? 'Player' : 'Players'}
+            <div className="w-full flex-1 flex items-center justify-center">
+              <div className="w-full max-w-4xl" style={{ maxHeight: 'calc(100vh - 280px)' }}>
+                <PokerTable
+                  players={roomState.players}
+                  currentPlayerId={currentPlayerId}
+                  isRevealed={roomState.isRevealed}
+                  onEmote={handleEmote}
+                  centerContent={
+                    <div className="text-center">
+                      {roomState.isRevealed ? (
+                        <div className="space-y-1">
+                          <div className="text-xs text-muted-foreground mb-1">Results</div>
+                          {results.average !== null && (
+                            <div className="text-2xl md:text-3xl font-bold text-primary">
+                              Avg: {results.average.toFixed(1)}
+                            </div>
+                          )}
+                          {results.majority && (
+                            <div className="text-lg md:text-xl text-foreground/80">
+                              Most: {results.majority}
+                            </div>
+                          )}
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {allVoted ? 'Ready!' : 'Waiting...'}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                }
-              />
+                      ) : (
+                        <div>
+                          <div className="text-lg md:text-xl font-bold text-foreground/80">
+                            {roomState.players.length} {roomState.players.length === 1 ? 'Player' : 'Players'}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {allVoted ? 'Ready!' : 'Waiting...'}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+              </div>
             </div>
           ) : (
             <div className="flex-1 flex items-center justify-center">
@@ -345,8 +347,8 @@ export default function RoomPage() {
             </div>
           )}
 
-          {/* Voting Cards + Action Button - Bottom */}
-          <div className="shrink-0 space-y-1 relative z-10 pb-1">
+          {/* Voting Cards + Action Button */}
+          <div className="shrink-0 space-y-2 mt-4">
             {currentPlayer && !roomState.isRevealed && (
               <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
                 {VOTE_OPTIONS.map((value) => (

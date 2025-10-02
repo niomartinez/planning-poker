@@ -26,37 +26,39 @@ export function PokerTable({ players, currentPlayerId, isRevealed, centerContent
   };
 
   return (
-    <div className="relative w-full max-w-6xl mx-auto" style={{ aspectRatio: '16 / 10' }}>
-      {/* Poker Table */}
-      <div className="poker-table">
-        {/* Center content area */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/2 flex items-center justify-center">
-          {centerContent}
+    <div className="relative w-full h-full flex items-center justify-center">
+      <div className="relative w-full" style={{ aspectRatio: '16 / 9', maxHeight: '100%' }}>
+        {/* Poker Table */}
+        <div className="poker-table">
+          {/* Center content area */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/2 flex items-center justify-center">
+            {centerContent}
+          </div>
+
+          {/* Players positioned around the table */}
+          {players.map((player, index) => {
+            const { x, y } = getPlayerPosition(index, players.length);
+
+            return (
+              <div
+                key={player.id}
+                className="absolute"
+                style={{
+                  left: `${x}%`,
+                  top: `${y}%`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <PlayerCard
+                  player={player}
+                  isRevealed={isRevealed}
+                  isCurrentPlayer={player.id === currentPlayerId}
+                  onEmote={player.id === currentPlayerId ? onEmote : undefined}
+                />
+              </div>
+            );
+          })}
         </div>
-
-        {/* Players positioned around the table */}
-        {players.map((player, index) => {
-          const { x, y } = getPlayerPosition(index, players.length);
-
-          return (
-            <div
-              key={player.id}
-              className="absolute"
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            >
-              <PlayerCard
-                player={player}
-                isRevealed={isRevealed}
-                isCurrentPlayer={player.id === currentPlayerId}
-                onEmote={player.id === currentPlayerId ? onEmote : undefined}
-              />
-            </div>
-          );
-        })}
       </div>
     </div>
   );
