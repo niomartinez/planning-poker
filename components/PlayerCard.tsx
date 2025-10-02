@@ -26,7 +26,7 @@ export function PlayerCard({ player, isRevealed, isCurrentPlayer }: PlayerCardPr
           background: 'linear-gradient(145deg, rgba(51, 212, 255, 0.25) 0%, rgba(51, 212, 255, 0.15) 100%)',
           borderColor: 'rgba(51, 212, 255, 0.4)'
         }}>
-          <span className="text-lg md:text-xl">🂠</span>
+          <span className="text-lg md:text-xl font-bold" style={{ color: '#33D4FF' }}>?</span>
         </div>
       );
     }

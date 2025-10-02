@@ -220,7 +220,7 @@ export default function RoomPage() {
     <main className="h-screen bg-background overflow-hidden flex flex-col p-2 md:p-4">
       <div className="max-w-7xl mx-auto w-full flex flex-col h-full gap-2 md:gap-3">
         {/* Compact Header */}
-        <div className="flex justify-between items-center gap-2 shrink-0">
+        <div className="flex justify-between items-center gap-2 shrink-0 relative z-30">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -327,50 +327,47 @@ export default function RoomPage() {
           )}
 
           {/* Voting Cards + Action Button - Bottom */}
-          {currentPlayer && (
-            <div className="shrink-0 space-y-2">
-              {!roomState.isRevealed && (
-                <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
-                  {VOTE_OPTIONS.map((value) => (
-                    <VotingCard
-                      key={value}
-                      value={value}
-                      selected={currentPlayer.vote === value}
-                      onClick={() => handleVote(value)}
-                      compact
-                    />
-                  ))}
-                </div>
-              )}
+          <div className="shrink-0 space-y-2">
+            {currentPlayer && !roomState.isRevealed && (
+              <div className="flex flex-wrap justify-center gap-1.5 md:gap-2">
+                {VOTE_OPTIONS.map((value) => (
+                  <VotingCard
+                    key={value}
+                    value={value}
+                    selected={currentPlayer.vote === value}
+                    onClick={() => handleVote(value)}
+                    compact
+                  />
+                ))}
+              </div>
+            )}
 
-              {/* Action Button */}
-              {roomState.players.length > 0 && (
-                <div className="flex justify-center">
-                  {!roomState.isRevealed ? (
-                    <Button
-                      onClick={handleReveal}
-                      disabled={!allVoted}
-                      size="sm"
-                      className="gap-1.5 h-8"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Reveal
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleReset}
-                      size="sm"
-                      className="gap-1.5 h-8"
-                      variant="secondary"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      New Round
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+            {/* Action Button */}
+            {roomState.players.length > 0 && (
+              <div className="flex justify-center">
+                {!roomState.isRevealed ? (
+                  <Button
+                    onClick={handleReveal}
+                    size="sm"
+                    className="gap-1.5 h-8"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    Reveal {!allVoted && '(Some pending)'}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleReset}
+                    size="sm"
+                    className="gap-1.5 h-8"
+                    variant="secondary"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    New Round
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
