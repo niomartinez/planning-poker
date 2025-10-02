@@ -50,12 +50,12 @@ export function VotingCard({ value, selected, onClick, disabled, compact }: Voti
     >
       {selected && (
         <div className={cn(
-          "absolute rounded-full ring-2 flex items-center justify-center",
-          compact ? "-top-1.5 -right-1.5 w-5 h-5" : "-top-3 -right-3 w-8 h-8 ring-4"
+          "absolute rounded-full flex items-center justify-center",
+          compact ? "-top-1.5 -right-1.5 w-5 h-5 ring-2" : "-top-3 -right-3 w-8 h-8 ring-4"
         )}
         style={{
           background: 'linear-gradient(145deg, #1EE8A5 0%, #19c78d 100%)',
-          ringColor: '#1EE8A5'
+          borderColor: '#1EE8A5'
         }}>
           <span className={cn("font-bold", compact ? "text-xs" : "text-sm")} style={{ color: '#161427' }}>✓</span>
         </div>
