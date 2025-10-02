@@ -68,13 +68,6 @@ export function PlayerCard({ player, isRevealed, isCurrentPlayer, onEmote }: Pla
         isCurrentPlayer ? 'border-primary shadow-md shadow-primary/20' : 'border-border/50'
       )}
     >
-      {/* Emote display */}
-      {player.currentEmote && (
-        <div className="absolute -top-5 md:-top-6 left-1/2 -translate-x-1/2 text-2xl md:text-3xl animate-bounce z-10">
-          {player.currentEmote}
-        </div>
-      )}
-
       {/* Emote Picker - only for current player */}
       {isCurrentPlayer && onEmote && (
         <div className="absolute -top-2 -right-2 z-20">

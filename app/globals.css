@@ -115,4 +115,22 @@
       0 2px 4px rgba(0, 0, 0, 0.3),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
+
+  .animate-float-up {
+    animation: floatUp 3s ease-out forwards;
+  }
+
+  @keyframes floatUp {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-400px) scale(0.8);
+      opacity: 0;
+    }
+  }
 }

@@ -11,6 +11,7 @@ import { NameDialog } from '@/components/NameDialog';
 import { VotingCard } from '@/components/VotingCard';
 import { PokerTable } from '@/components/PokerTable';
 import { Results } from '@/components/Results';
+import { FloatingEmote } from '@/components/FloatingEmote';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Eye, RotateCcw, Edit2, Copy, Check, ArrowLeft, Share2 } from 'lucide-react';
@@ -28,6 +29,7 @@ export default function RoomPage() {
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
   const [currentPlayerName, setCurrentPlayerName] = useState<string | null>(null);
   const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
+  const [floatingEmotes, setFloatingEmotes] = useState<Array<{ id: string; emote: string; playerName: string }>>([]);
 
   const { roomState, sendMessage } = usePartyRoom(roomCode);
 
@@ -102,6 +104,26 @@ export default function RoomPage() {
       setShowNameDialog(true);
     }
   }, [currentPlayerId, roomState]);
+
+  // Watch for emotes from all players
+  useEffect(() => {
+    if (!roomState) return;
+
+    roomState.players.forEach((player) => {
+      if (player.currentEmote) {
+        // Check if we already have this emote displayed
+        const emoteId = `${player.id}-${player.currentEmote}-${Date.now()}`;
+        const exists = floatingEmotes.some((e) => e.playerName === player.name && e.emote === player.currentEmote);
+
+        if (!exists) {
+          setFloatingEmotes((prev) => [
+            ...prev,
+            { id: emoteId, emote: player.currentEmote!, playerName: player.name },
+          ]);
+        }
+      }
+    });
+  }, [roomState, floatingEmotes]);
 
   const handleNameSubmit = (name: string, emoji: string) => {
     if (!currentPlayer) {
@@ -379,6 +401,18 @@ export default function RoomPage() {
         currentName={editingName ? currentPlayer?.name : ''}
         currentEmoji={editingName ? currentPlayer?.emoji : undefined}
       />
+
+      {/* Floating Emotes */}
+      {floatingEmotes.map((emote) => (
+        <FloatingEmote
+          key={emote.id}
+          emote={emote.emote}
+          playerName={emote.playerName}
+          onComplete={() => {
+            setFloatingEmotes((prev) => prev.filter((e) => e.id !== emote.id));
+          }}
+        />
+      ))}
     </main>
   );
 }
