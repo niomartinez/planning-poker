@@ -3,14 +3,16 @@
 import { Player } from '@/types';
 import { cn } from '@/lib/utils';
 import { Loader2, Coffee, HelpCircle } from 'lucide-react';
+import { EmotePicker } from './EmotePicker';
 
 interface PlayerCardProps {
   player: Player;
   isRevealed: boolean;
   isCurrentPlayer: boolean;
+  onEmote?: (emote: string) => void;
 }
 
-export function PlayerCard({ player, isRevealed, isCurrentPlayer }: PlayerCardProps) {
+export function PlayerCard({ player, isRevealed, isCurrentPlayer, onEmote }: PlayerCardProps) {
   const renderVote = () => {
     if (!player.hasVoted) {
       return (
@@ -70,6 +72,13 @@ export function PlayerCard({ player, isRevealed, isCurrentPlayer }: PlayerCardPr
       {player.currentEmote && (
         <div className="absolute -top-5 md:-top-6 left-1/2 -translate-x-1/2 text-2xl md:text-3xl animate-bounce z-10">
           {player.currentEmote}
+        </div>
+      )}
+
+      {/* Emote Picker - only for current player */}
+      {isCurrentPlayer && onEmote && (
+        <div className="absolute -top-2 -right-2 z-20">
+          <EmotePicker onEmote={onEmote} />
         </div>
       )}
 

@@ -9,9 +9,10 @@ interface PokerTableProps {
   currentPlayerId: string | null;
   isRevealed: boolean;
   centerContent?: ReactNode;
+  onEmote?: (emote: string) => void;
 }
 
-export function PokerTable({ players, currentPlayerId, isRevealed, centerContent }: PokerTableProps) {
+export function PokerTable({ players, currentPlayerId, isRevealed, centerContent, onEmote }: PokerTableProps) {
   // Calculate position for each player around the ellipse
   const getPlayerPosition = (index: number, total: number) => {
     const angle = (index / total) * 2 * Math.PI - Math.PI / 2; // Start from top
@@ -51,6 +52,7 @@ export function PokerTable({ players, currentPlayerId, isRevealed, centerContent
                 player={player}
                 isRevealed={isRevealed}
                 isCurrentPlayer={player.id === currentPlayerId}
+                onEmote={player.id === currentPlayerId ? onEmote : undefined}
               />
             </div>
           );

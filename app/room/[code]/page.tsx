@@ -10,7 +10,6 @@ import { VoteValue, NumericVoteValue } from '@/types';
 import { NameDialog } from '@/components/NameDialog';
 import { VotingCard } from '@/components/VotingCard';
 import { PokerTable } from '@/components/PokerTable';
-import { EmotePicker } from '@/components/EmotePicker';
 import { Results } from '@/components/Results';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -238,7 +237,6 @@ export default function RoomPage() {
               <div className="flex items-center gap-2 bg-card/80 border border-primary/20 rounded-lg px-2 py-1">
                 <div className="text-xl md:text-2xl">{currentPlayer.emoji}</div>
                 <span className="text-xs md:text-sm font-semibold hidden sm:inline">{currentPlayer.name}</span>
-                <EmotePicker onEmote={handleEmote} />
                 <Button
                   variant="ghost"
                   size="sm"
@@ -285,6 +283,7 @@ export default function RoomPage() {
                 players={roomState.players}
                 currentPlayerId={currentPlayerId}
                 isRevealed={roomState.isRevealed}
+                onEmote={handleEmote}
                 centerContent={
                   <div className="text-center">
                     {roomState.isRevealed ? (
