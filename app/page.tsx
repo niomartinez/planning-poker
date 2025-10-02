@@ -46,11 +46,8 @@ export default function Home() {
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-5xl md:text-6xl font-bold text-primary drop-shadow-2xl">
-            🃏 Planning Poker
+            Planning Poker
           </h1>
-          <p className="text-foreground/90 text-xl font-medium drop-shadow">
-            Agile Estimation Made Simple
-          </p>
         </div>
 
         {/* Options */}
