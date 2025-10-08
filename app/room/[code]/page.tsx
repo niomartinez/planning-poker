@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
@@ -31,6 +31,7 @@ export default function RoomPage() {
   const [currentPlayerName, setCurrentPlayerName] = useState<string | null>(null);
   const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
   const [floatingEmotes, setFloatingEmotes] = useState<Array<{ id: string; emote: string; playerName: string }>>([]);
+  const lastSeenEmotes = useRef<Map<string, string>>(new Map()); // Track last emote per player to prevent duplicates
 
   const { roomState, sendMessage } = usePartyRoom(roomCode);
 
@@ -112,14 +113,25 @@ export default function RoomPage() {
 
     roomState.players.forEach((player) => {
       if (player.currentEmote) {
-        // Create unique ID with timestamp to allow spam of same emote
-        const emoteId = `${player.id}-${player.currentEmote}-${Date.now()}`;
+        // Create unique key for this emote instance
+        const emoteKey = `${player.id}-${player.currentEmote}`;
+        const lastSeen = lastSeenEmotes.current.get(player.id);
 
-        // Add emote without duplicate check to allow spam
-        setFloatingEmotes((prev) => [
-          ...prev,
-          { id: emoteId, emote: player.currentEmote!, playerName: player.name },
-        ]);
+        // Only add if this is a new emote (different from last seen for this player)
+        if (lastSeen !== emoteKey) {
+          const emoteId = `${player.id}-${player.currentEmote}-${Date.now()}`;
+
+          setFloatingEmotes((prev) => [
+            ...prev,
+            { id: emoteId, emote: player.currentEmote!, playerName: player.name },
+          ]);
+
+          // Update last seen emote for this player
+          lastSeenEmotes.current.set(player.id, emoteKey);
+        }
+      } else {
+        // Clear last seen when emote is null (allows same emote to be sent again)
+        lastSeenEmotes.current.delete(player.id);
       }
     });
   }, [roomState]);

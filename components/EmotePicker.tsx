@@ -56,6 +56,7 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
     if (emoteCounts.current.length >= MAX_EMOTES_PER_WINDOW) {
       if (!isRateLimited) {
         setIsRateLimited(true);
+        setIsOpen(false); // Close picker when cooldown activates
         setTimeout(() => setIsRateLimited(false), COOLDOWN_DURATION);
       }
       return;
@@ -107,15 +108,15 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full left-0 mt-2 z-20 bg-card border-2 border-border rounded-lg shadow-xl p-4">
-            <div className="grid grid-cols-3 gap-3">
+          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border-2 border-border rounded-lg shadow-xl p-2">
+            <div className="grid grid-cols-3 gap-1">
               {REACTION_EMOJIS.map((emote) => (
                 <button
                   key={emote}
                   onClick={() => handleEmote(emote)}
                   disabled={isRateLimited}
                   className={cn(
-                    "text-4xl p-2 rounded transition-colors w-14 h-14 flex items-center justify-center",
+                    "text-2xl p-1 rounded transition-colors w-10 h-10 flex items-center justify-center",
                     isRateLimited
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-primary/20"
