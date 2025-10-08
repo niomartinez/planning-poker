@@ -20,6 +20,7 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
   const [cooldownProgress, setCooldownProgress] = useState(0);
   const emoteCounts = useRef<number[]>([]);
   const cooldownStartTime = useRef<number>(0);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   // Animate cooldown progress
   useEffect(() => {
@@ -73,8 +74,9 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
   const strokeDashoffset = circumference - (cooldownProgress / 100) * circumference;
 
   return (
-    <div className="relative">
+    <div className="relative inline-block">
       <Button
+        ref={buttonRef}
         variant="outline"
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
@@ -96,7 +98,6 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
               className="text-primary"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
-              style={{ transition: 'stroke-dashoffset 0.05s linear' }}
             />
           </svg>
         )}
@@ -108,15 +109,15 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border-2 border-border rounded-lg shadow-xl p-2">
-            <div className="grid grid-cols-3 gap-1">
+          <div className="absolute bottom-full right-0 mb-1 z-20 bg-card border border-border rounded shadow-lg p-1">
+            <div className="grid grid-cols-4 gap-0.5">
               {REACTION_EMOJIS.map((emote) => (
                 <button
                   key={emote}
                   onClick={() => handleEmote(emote)}
                   disabled={isRateLimited}
                   className={cn(
-                    "text-2xl p-1 rounded transition-colors w-10 h-10 flex items-center justify-center",
+                    "text-base leading-none p-0.5 rounded w-6 h-6 flex items-center justify-center",
                     isRateLimited
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-primary/20"
