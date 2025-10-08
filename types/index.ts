@@ -8,6 +8,7 @@ export interface Player {
   hasVoted: boolean;
   emoji: string;
   currentEmote?: string | null;
+  emoteTimestamp?: number | null;
 }
 
 export interface RoomState {

@@ -111,7 +111,7 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomState) return;
 
-    roomState.players.forEach((player: any) => {
+    roomState.players.forEach((player) => {
       if (player.currentEmote && player.emoteTimestamp) {
         // Use timestamp to track unique emote instances
         const lastSeenTimestamp = lastSeenEmotes.current.get(player.id);
