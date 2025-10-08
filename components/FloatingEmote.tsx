@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 interface FloatingEmoteProps {
   emote: string;
@@ -9,21 +9,21 @@ interface FloatingEmoteProps {
 }
 
 export function FloatingEmote({ emote, playerName, onComplete }: FloatingEmoteProps) {
-  const [style, setStyle] = useState<React.CSSProperties>({});
-
-  useEffect(() => {
-    // Random horizontal position (10% to 90% of screen width)
+  // Calculate position once on mount
+  const style = useMemo<React.CSSProperties>(() => {
     const randomX = Math.random() * 80 + 10;
-
-    setStyle({
+    return {
       left: `${randomX}%`,
       bottom: '10%',
-    });
+    };
+  }, []);
 
+  useEffect(() => {
     // Auto-remove after animation completes
     const timer = setTimeout(onComplete, 3000);
     return () => clearTimeout(timer);
-  }, [onComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   return (
     <div
