@@ -31,7 +31,7 @@ export default function RoomPage() {
   const [currentPlayerName, setCurrentPlayerName] = useState<string | null>(null);
   const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
   const [floatingEmotes, setFloatingEmotes] = useState<Array<{ id: string; emote: string; playerName: string }>>([]);
-  const lastSeenEmotes = useRef<Map<string, string>>(new Map()); // Track last emote per player to prevent duplicates
+  const lastSeenEmotes = useRef<Map<string, number>>(new Map()); // Track last emote timestamp per player to prevent duplicates
 
   const { roomState, sendMessage } = usePartyRoom(roomCode);
 
@@ -111,26 +111,25 @@ export default function RoomPage() {
   useEffect(() => {
     if (!roomState) return;
 
-    roomState.players.forEach((player) => {
-      if (player.currentEmote) {
-        // Create unique key for this emote instance
-        const emoteKey = `${player.id}-${player.currentEmote}`;
-        const lastSeen = lastSeenEmotes.current.get(player.id);
+    roomState.players.forEach((player: any) => {
+      if (player.currentEmote && player.emoteTimestamp) {
+        // Use timestamp to track unique emote instances
+        const lastSeenTimestamp = lastSeenEmotes.current.get(player.id);
 
-        // Only add if this is a new emote (different from last seen for this player)
-        if (lastSeen !== emoteKey) {
-          const emoteId = `${player.id}-${player.currentEmote}-${Date.now()}`;
+        // Only add if this is a new emote instance (different timestamp)
+        if (lastSeenTimestamp !== player.emoteTimestamp) {
+          const emoteId = `${player.id}-${player.emoteTimestamp}`;
 
           setFloatingEmotes((prev) => [
             ...prev,
             { id: emoteId, emote: player.currentEmote!, playerName: player.name },
           ]);
 
-          // Update last seen emote for this player
-          lastSeenEmotes.current.set(player.id, emoteKey);
+          // Update last seen timestamp for this player
+          lastSeenEmotes.current.set(player.id, player.emoteTimestamp);
         }
-      } else {
-        // Clear last seen when emote is null (allows same emote to be sent again)
+      } else if (!player.currentEmote) {
+        // Clear last seen when emote is null
         lastSeenEmotes.current.delete(player.id);
       }
     });

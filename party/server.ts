@@ -47,7 +47,7 @@ export default class PokerRoomServer implements Party.Server {
         break;
       case 'emote':
         this.state.players = this.state.players.map((p: any) =>
-          p.id === data.playerId ? { ...p, currentEmote: data.emote } : p
+          p.id === data.playerId ? { ...p, currentEmote: data.emote, emoteTimestamp: Date.now() } : p
         );
         // Broadcast immediately with emote set
         this.room.broadcast(JSON.stringify({
@@ -57,7 +57,7 @@ export default class PokerRoomServer implements Party.Server {
         // Clear emote after delay (don't broadcast again)
         setTimeout(() => {
           this.state.players = this.state.players.map((p: any) =>
-            p.id === data.playerId ? { ...p, currentEmote: null } : p
+            p.id === data.playerId ? { ...p, currentEmote: null, emoteTimestamp: null } : p
           );
         }, 3000);
         // Skip the broadcast at the end for emotes
