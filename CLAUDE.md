@@ -122,3 +122,14 @@ NEXT_PUBLIC_PARTYKIT_HOST=localhost:1999
 - **Next.js app**: Deploy to Vercel or any Next.js host
 - **PartyKit server**: Deploy separately using `npx partykit deploy`
 - Set `NEXT_PUBLIC_PARTYKIT_HOST` to your deployed PartyKit URL in production
+
+## Code Quality and Deployment Workflow
+
+When completing work on features or fixes, always follow this workflow before pushing to main:
+
+1. **Run lint check**: `npm run lint` - Ensure code meets linting standards
+2. **Run build check**: `npm run build` - Verify production build succeeds with no errors
+3. **Manual testing**: Run `npm run dev:all` and test the functionality in browser
+4. **Commit and push**: After all checks pass, commit changes and push to main branch
+
+This ensures all code pushed to main is production-ready and has been validated.
