@@ -112,19 +112,17 @@ export default function RoomPage() {
 
     roomState.players.forEach((player) => {
       if (player.currentEmote) {
-        // Check if we already have this emote displayed
+        // Create unique ID with timestamp to allow spam of same emote
         const emoteId = `${player.id}-${player.currentEmote}-${Date.now()}`;
-        const exists = floatingEmotes.some((e) => e.playerName === player.name && e.emote === player.currentEmote);
 
-        if (!exists) {
-          setFloatingEmotes((prev) => [
-            ...prev,
-            { id: emoteId, emote: player.currentEmote!, playerName: player.name },
-          ]);
-        }
+        // Add emote without duplicate check to allow spam
+        setFloatingEmotes((prev) => [
+          ...prev,
+          { id: emoteId, emote: player.currentEmote!, playerName: player.name },
+        ]);
       }
     });
-  }, [roomState, floatingEmotes]);
+  }, [roomState]);
 
   const handleNameSubmit = (name: string, emoji: string) => {
     if (!currentPlayer) {
