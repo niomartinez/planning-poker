@@ -109,7 +109,7 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border border-border rounded-md shadow-lg p-2 h-[90px] w-auto min-w-[200px]">
+          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border border-border rounded-md shadow-lg h-[90px] w-auto min-w-[200px]">
             <div className="flex flex-wrap gap-1">
               {REACTION_EMOJIS.map((emote) => (
                 <button
@@ -117,7 +117,7 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
                   onClick={() => handleEmote(emote)}
                   disabled={isRateLimited}
                   className={cn(
-                    "text-xl p-2 rounded min-w-[36px] min-h-[36px] flex items-center justify-center",
+                    "text-xl rounded min-w-[36px] min-h-[36px] flex items-center justify-center",
                     isRateLimited
                       ? "opacity-50 cursor-not-allowed"
                       : "hover:bg-primary/20"
