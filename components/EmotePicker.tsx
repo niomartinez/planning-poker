@@ -109,8 +109,8 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border border-border rounded-md shadow-lg p-2">
-            <div className="flex flex-wrap gap-1 max-w-[200px]">
+          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border border-border rounded-md shadow-lg p-2 h-[90px] w-auto min-w-[200px]">
+            <div className="flex flex-wrap gap-1">
               {REACTION_EMOJIS.map((emote) => (
                 <button
                   key={emote}
