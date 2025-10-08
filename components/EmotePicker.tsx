@@ -106,11 +106,11 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute bottom-full right-0 mb-2 z-20 bg-card border border-border rounded-md shadow-lg p-2">
-            <div className="grid grid-cols-5 gap-2">
+          <div className="absolute top-full right-0 mt-2 z-[101] bg-card border border-border rounded-md shadow-lg p-2">
+            <div className="grid grid-cols-5 gap-2 w-[200px]">
               {REACTION_EMOJIS.map((emote) => (
                 <button
                   key={emote}
