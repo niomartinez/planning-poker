@@ -15,6 +15,7 @@ import { FloatingEmote } from '@/components/FloatingEmote';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Eye, RotateCcw, Edit2, Copy, Check, ArrowLeft, Share2 } from 'lucide-react';
+import Image from 'next/image';
 
 const VOTE_OPTIONS: VoteValue[] = [1, 2, 3, 5, 8, 13, 21, 'pass', '?'];
 
@@ -250,7 +251,14 @@ export default function RoomPage() {
               <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 md:mr-1" />
               <span className="hidden md:inline text-xs">Leave</span>
             </Button>
-            <h1 className="text-lg md:text-2xl font-bold text-primary">Planning Poker</h1>
+            <Image
+              src="/logo.png"
+              alt="Atlas Logo"
+              width={32}
+              height={32}
+              className="w-6 h-6 md:w-8 md:h-8"
+            />
+            <h1 className="text-lg md:text-2xl font-bold text-primary">Atlas Planning Poker</h1>
           </div>
 
           <div className="flex items-center gap-2">

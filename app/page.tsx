@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Plus, Users } from 'lucide-react';
+import Image from 'next/image';
 import { generateRoomCode, validateRoomCode } from '@/lib/roomCode';
 import { useGameStore } from '@/store/useGameStore';
 
@@ -44,9 +45,19 @@ export default function Home() {
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-4">
+          <div className="flex justify-center">
+            <Image
+              src="/logo.png"
+              alt="Atlas Planning Poker Logo"
+              width={200}
+              height={200}
+              priority
+              className="drop-shadow-2xl"
+            />
+          </div>
           <h1 className="text-5xl md:text-6xl font-bold text-primary drop-shadow-2xl">
-            Planning Poker
+            Atlas Planning Poker
           </h1>
         </div>
 
