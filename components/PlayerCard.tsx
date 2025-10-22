@@ -65,7 +65,8 @@ export function PlayerCard({ player, isRevealed, isCurrentPlayer, onEmote }: Pla
       className={cn(
         'relative flex flex-col items-center gap-1 p-1.5 md:p-2 rounded-lg transition-all',
         'bg-card/80 backdrop-blur-sm border',
-        isCurrentPlayer ? 'border-primary shadow-md shadow-primary/20' : 'border-border/50'
+        isCurrentPlayer ? 'border-primary shadow-md shadow-primary/20' : 'border-border/50',
+        !player.hasVoted && !isRevealed && 'animate-pulse-glow'
       )}
     >
       {/* Emote Picker - only for current player */}

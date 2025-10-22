@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { REACTION_EMOJIS } from '@/lib/emojis';
 import { Button } from './ui/button';
 import { Smile } from 'lucide-react';
@@ -18,9 +19,27 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [cooldownProgress, setCooldownProgress] = useState(0);
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 });
+  const [mounted, setMounted] = useState(false);
   const emoteCounts = useRef<number[]>([]);
   const cooldownStartTime = useRef<number>(0);
   const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Track mounted state for portal
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Update picker position when opened
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setPickerPosition({
+        top: rect.bottom + 8,
+        left: rect.right - 200, // Align right edge of picker with button
+      });
+    }
+  }, [isOpen]);
 
   // Animate cooldown progress
   useEffect(() => {
@@ -74,7 +93,7 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
   const strokeDashoffset = circumference - (cooldownProgress / 100) * circumference;
 
   return (
-    <div className="relative inline-block">
+    <>
       <Button
         ref={buttonRef}
         variant="outline"
@@ -103,13 +122,19 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
         )}
       </Button>
 
-      {isOpen && (
+      {mounted && isOpen && createPortal(
         <>
           <div
-            className="fixed inset-0 z-[100]"
+            className="fixed inset-0 z-[9999]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute top-full right-0 mt-2 z-[101] bg-card border border-border rounded-md shadow-lg p-2">
+          <div
+            className="fixed z-[10000] bg-card border border-border rounded-md shadow-lg p-2"
+            style={{
+              top: `${pickerPosition.top}px`,
+              left: `${pickerPosition.left}px`,
+            }}
+          >
             <div className="grid grid-cols-5 gap-2 w-[200px]">
               {REACTION_EMOJIS.map((emote) => (
                 <button
@@ -128,8 +153,9 @@ export function EmotePicker({ onEmote }: EmotePickerProps) {
               ))}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
-    </div>
+    </>
   );
 }
