@@ -23,16 +23,17 @@ export function NameDialog({ open, onSubmit, onCancel, currentName = '', current
     e.preventDefault();
     if (name.trim()) {
       let finalName = name.trim();
+      // Easter egg: Val -> Valvin (check before lowercase easter egg)
+      if (finalName.toLowerCase() === 'val') {
+        finalName = 'Valvin';
+      }
       // Easter egg: Ben -> Benjamin
-      if (finalName.toLowerCase() === 'ben') {
+      else if (finalName.toLowerCase() === 'ben') {
         finalName = 'Benjamin';
       }
       // Easter egg: lowercase first letter -> add Michael Dela Cruz surname
-      if (finalName.length > 0 && finalName[0] === finalName[0].toLowerCase()) {
-        finalName = finalName + " michael dela cruz"
-      }
-      if (finalName.toLowerCase() === 'val') {
-        finalName = 'Valvin';
+      else if (finalName.length > 0 && finalName[0] === finalName[0].toLowerCase()) {
+        finalName = finalName + " michael dela cruz";
       }
       onSubmit(finalName, selectedEmoji);
       setName('');
