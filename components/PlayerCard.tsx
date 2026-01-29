@@ -2,7 +2,7 @@
 
 import { Player } from '@/types';
 import { cn } from '@/lib/utils';
-import { Loader2, Coffee, HelpCircle } from 'lucide-react';
+import { Loader2, Coffee, HelpCircle, Crown } from 'lucide-react';
 import { EmotePicker } from './EmotePicker';
 
 interface PlayerCardProps {
@@ -81,6 +81,11 @@ export function PlayerCard({ player, isRevealed, isCurrentPlayer, onEmote }: Pla
         {player.emoji}
         {isCurrentPlayer && (
           <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-primary rounded-full border border-card" />
+        )}
+        {player.isAdmin && (
+          <div className="absolute -top-1 -right-1">
+            <Crown className="w-3 h-3 md:w-4 md:h-4 text-yellow-500 fill-yellow-500" />
+          </div>
         )}
       </div>
 

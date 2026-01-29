@@ -7,6 +7,7 @@ export default class PokerRoomServer implements Party.Server {
   state: any = {
     players: [],
     isRevealed: false,
+    currentTicket: '',
   };
 
   onConnect(conn: Party.Connection) {
@@ -26,7 +27,9 @@ export default class PokerRoomServer implements Party.Server {
         // Only add player if they don't already exist
         const existingPlayer = this.state.players.find((p: any) => p.id === data.player.id);
         if (!existingPlayer) {
-          this.state.players.push(data.player);
+          // First player becomes admin
+          const isFirstPlayer = this.state.players.length === 0;
+          this.state.players.push({ ...data.player, isAdmin: isFirstPlayer });
         }
         break;
       case 'vote':
@@ -68,7 +71,19 @@ export default class PokerRoomServer implements Party.Server {
         );
         break;
       case 'leave':
+        const leavingPlayer = this.state.players.find((p: any) => p.id === data.playerId);
         this.state.players = this.state.players.filter((p: any) => p.id !== data.playerId);
+        // If admin left, promote next player
+        if (leavingPlayer?.isAdmin && this.state.players.length > 0) {
+          this.state.players[0].isAdmin = true;
+        }
+        break;
+      case 'updateTicket':
+        // Only allow admin to update ticket
+        const updatingPlayer = this.state.players.find((p: any) => p.id === data.playerId);
+        if (updatingPlayer?.isAdmin) {
+          this.state.currentTicket = data.ticket;
+        }
         break;
     }
 

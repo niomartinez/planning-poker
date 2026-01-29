@@ -9,11 +9,13 @@ export interface Player {
   emoji: string;
   currentEmote?: string | null;
   emoteTimestamp?: number | null;
+  isAdmin?: boolean;
 }
 
 export interface RoomState {
   players: Player[];
   isRevealed: boolean;
+  currentTicket?: string;
 }
 
 export interface GameState {
