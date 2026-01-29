@@ -33,7 +33,7 @@ export function NameDialog({ open, onSubmit, onCancel, currentName = '', current
       }
       // Easter egg: lowercase first letter -> add Michael Dela Cruz surname
       else if (finalName.length > 0 && finalName[0] === finalName[0].toLowerCase()) {
-        finalName = finalName + " michael dela cruz"
+        finalName = finalName + " michael dela cruz";
       }
       onSubmit(finalName, selectedEmoji);
       setName('');
