@@ -14,7 +14,8 @@ import { Results } from '@/components/Results';
 import { FloatingEmote } from '@/components/FloatingEmote';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Eye, RotateCcw, Edit2, Copy, Check, ArrowLeft, Share2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Eye, RotateCcw, Edit2, Copy, Check, ArrowLeft, Share2, Crown } from 'lucide-react';
 import Image from 'next/image';
 
 const VOTE_OPTIONS: VoteValue[] = [1, 2, 3, 5, 8, 13, 21, 'pass', '?'];
@@ -32,11 +33,19 @@ export default function RoomPage() {
   const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
   const [floatingEmotes, setFloatingEmotes] = useState<Array<{ id: string; emote: string; playerName: string }>>([]);
   const lastSeenEmotes = useRef<Map<string, number>>(new Map()); // Track last emote timestamp per player to prevent duplicates
+  const [ticketDescription, setTicketDescription] = useState('');
 
   const { roomState, sendMessage } = usePartyRoom(roomCode);
 
   const currentPlayer = roomState?.players.find((p) => p.id === currentPlayerId);
   const allVoted = roomState && roomState.players.length > 0 && roomState.players.every((p) => p.hasVoted);
+
+  // Sync ticket description from room state
+  useEffect(() => {
+    if (roomState?.currentTicket !== undefined) {
+      setTicketDescription(roomState.currentTicket);
+    }
+  }, [roomState?.currentTicket]);
 
   // Calculate results
   const getResults = () => {
@@ -235,6 +244,17 @@ export default function RoomPage() {
     router.push('/');
   };
 
+  const handleTicketUpdate = (newTicket: string) => {
+    setTicketDescription(newTicket);
+    if (currentPlayerId && currentPlayer?.isAdmin) {
+      sendMessage({
+        type: 'updateTicket',
+        playerId: currentPlayerId,
+        ticket: newTicket,
+      });
+    }
+  };
+
   if (!roomState) {
     return (
       <main className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center">
@@ -311,6 +331,28 @@ export default function RoomPage() {
             </div>
           </div>
         </div>
+
+        {/* Ticket Description Section */}
+        {currentPlayer?.isAdmin ? (
+          <div className="shrink-0 mb-2 max-w-2xl mx-auto w-full">
+            <div className="flex items-center gap-2 bg-card/80 border border-primary/20 rounded-lg px-3 py-2">
+              <Crown className="w-4 h-4 text-yellow-500 shrink-0" />
+              <Input
+                type="text"
+                placeholder="Enter ticket being estimated (e.g., USER-123: Add login feature)"
+                value={ticketDescription}
+                onChange={(e) => handleTicketUpdate(e.target.value)}
+                className="h-8 text-sm border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
+          </div>
+        ) : roomState?.currentTicket ? (
+          <div className="shrink-0 mb-2 max-w-2xl mx-auto w-full">
+            <div className="bg-card/80 border border-primary/20 rounded-lg px-3 py-2 text-center">
+              <p className="text-sm font-semibold text-primary">{roomState.currentTicket}</p>
+            </div>
+          </div>
+        ) : null}
 
         {/* Main Content - Centered */}
         <div className="flex-1 flex flex-col justify-center items-center min-h-0">
