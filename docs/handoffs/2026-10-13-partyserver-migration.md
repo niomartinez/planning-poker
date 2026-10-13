@@ -12,10 +12,19 @@
 
 On October 13, 2026 the owner explicitly authorized completing the migration to live production with fresh rooms and no preservation requirement. This supersedes the earlier local-only/no-push/no-deploy boundary. No old-room inventory, export, or import is required for this rollout; old resources are not to be deleted unnecessarily.
 
-Publication, backend deployment, and frontend cutover are authorized. New persistent credential grants, paid charges, and legal agreement acceptance remain separate approval boundaries. Wrangler is unauthenticated, and approval to start its standard browser login is pending. No new credential has been generated, and no production deployment or frontend host change has occurred yet.
+Publication, backend deployment, and frontend cutover are authorized. New persistent credential grants, paid charges, and legal agreement acceptance remain separate approval boundaries. Wrangler is unauthenticated, and approval to start its standard browser login is pending. No new credential has been generated. No Cloudflare Worker has been deployed, and the original production URLs still point to the rollback baseline. A production-target frontend candidate was built without assigning the original aliases; it is platform validation, not the completed migration.
 
 Existing Vercel authentication and project matching are verified. The checkout is linked locally to the existing project `planning-poker` in `niomartinez's projects`; ignored `.vercel/` metadata is not committed. The current production deployment is `dpl_FfejdutDRmia3y2P1HBXTE5zZs85`, source commit `1a92296df646cd72e34de72fc399d165c8e2a765`, unique URL `https://planning-poker-r3zrtvr1j-niomartinezs-projects.vercel.app`, with production alias `https://planning-poker-ten-sooty.vercel.app`. This is the rollback baseline, not the migrated release. The Git integration uses `main`, and the hosted runtime is configured as Node 22.x. Production, preview, and development have the existing `NEXT_PUBLIC_PARTYKIT_HOST`; `NEXT_PUBLIC_PARTYSERVER_HOST` is not yet configured.
 
+
+## Published Candidate and Platform Validation
+
+- App/source commit: `3bb44d26646ec86df9770919528662e4882457a8`, published on `codex/partyserver-migration` in the existing repository. `main` is unchanged.
+- Vercel candidate: `dpl_95vuyFyDAYz6NDidvFnuyHHP9ejQ`, READY, exact source SHA verified through deployment metadata, matched project `planning-poker`, actual Node runtime metadata 22.x.
+- Candidate URL: `https://planning-poker-h0rb3k3om-niomartinez.vercel.app`. The CLI assigned the generated default alias `https://planning-poker-niomartinez.vercel.app`; the three recorded original aliases still resolve to `dpl_FfejdutDRmia3y2P1HBXTE5zZs85`.
+- Remote Linux/Vercel install and production build passed. The candidate image endpoint returned HTTP 200, `image/webp`, 1,734 bytes; decoding confirmed a valid 64x56 WebP logo.
+- **Do not promote this artifact as the final PartyServer migration.** It was built before a Cloudflare hostname was available and retains the legacy backend environment. Deploy/verify the new Worker, set `NEXT_PUBLIC_PARTYSERVER_HOST`, then rebuild a final frontend candidate before assigning the existing URLs.
+- Cloudflare persistent CLI authorization remains pending. Fresh-room production deployment and cutover are authorized once existing account/target checks and this access step are complete. No old-room backup is required.
 
 ## Deadline and Data Risk
 
