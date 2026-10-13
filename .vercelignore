@@ -1,2 +1,7 @@
 .next
 node_modules
+party/
+wrangler.jsonc
+tsconfig.worker.json
+.wrangler/
+.backups/

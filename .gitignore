@@ -36,3 +36,9 @@ next-env.d.ts
 
 # partykit
 .partykit/state/
+
+# Cloudflare local state/build output and secrets
+.wrangler/
+.dev.vars*
+# Private room snapshots
+.backups/

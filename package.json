@@ -4,18 +4,22 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "party": "partykit dev",
+    "party": "wrangler dev --ip 127.0.0.1 --port 1999",
     "dev:all": "concurrently \"npm run dev\" \"npm run party\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build:party": "wrangler deploy --dry-run --outdir .wrangler/build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.worker.json",
+    "test:multiplayer": "node scripts/test-multiplayer.mjs",
+    "backup:rooms": "node scripts/backup-rooms.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.344.0",
-    "next": "15.0.7",
-    "partykit": "^0.0.115",
+    "next": "15.5.27",
+    "partyserver": "^0.5.10",
     "partysocket": "^1.1.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -24,16 +28,30 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261013.1",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.17",
     "concurrently": "^9.2.1",
     "eslint": "^8.56.0",
-    "eslint-config-next": "^15.0.0",
-    "postcss": "^8.4.33",
-    "sharp": "^0.34.4",
+    "eslint-config-next": "15.5.27",
+    "postcss": "^8.5.30",
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "wrangler": "^4.149.0"
+  },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.30"
+    }
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.13.0 || >=24.0.0",
+      "onFail": "error"
+    }
   }
 }

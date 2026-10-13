@@ -7,9 +7,11 @@ export function usePartyRoom(roomCode: string) {
   const [socket, setSocket] = useState<PartySocket | null>(null);
 
   useEffect(() => {
-    // Connect to Partykit server
+    // PartyServer keeps the existing /parties/main/:room protocol.
     const partySocket = new PartySocket({
-      host: process.env.NEXT_PUBLIC_PARTYKIT_HOST || 'localhost:1999',
+      host: process.env.NEXT_PUBLIC_PARTYSERVER_HOST ||
+        process.env.NEXT_PUBLIC_PARTYKIT_HOST || 'localhost:1999',
+      party: 'main',
       room: roomCode,
     });
 

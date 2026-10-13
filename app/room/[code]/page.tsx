@@ -32,6 +32,7 @@ export default function RoomPage() {
   const [currentPlayerName, setCurrentPlayerName] = useState<string | null>(null);
   const [currentPlayerEmoji, setCurrentPlayerEmoji] = useState<string | null>(null);
   const [floatingEmotes, setFloatingEmotes] = useState<Array<{ id: string; emote: string; playerName: string }>>([]);
+  const isLeavingRoom = useRef(false);
   const lastSeenEmotes = useRef<Map<string, number>>(new Map()); // Track last emote timestamp per player to prevent duplicates
   const [ticketDescription, setTicketDescription] = useState('');
 
@@ -91,7 +92,7 @@ export default function RoomPage() {
 
   useEffect(() => {
     // Auto-join room when player info is available but not in room
-    if (currentPlayerId && currentPlayerName && currentPlayerEmoji && roomState) {
+    if (!isLeavingRoom.current && currentPlayerId && currentPlayerName && currentPlayerEmoji && roomState) {
       const playerInRoom = roomState.players.find((p) => p.id === currentPlayerId);
       if (!playerInRoom) {
         sendMessage({
@@ -235,6 +236,8 @@ export default function RoomPage() {
   };
 
   const handleLeaveRoom = () => {
+    // A leave sync can arrive before navigation unmounts this page.
+    isLeavingRoom.current = true;
     if (currentPlayerId) {
       sendMessage({
         type: 'leave',

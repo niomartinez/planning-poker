@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "planning-poker",
+  "main": "party/server.ts",
+  "compatibility_date": "2026-10-13",
+  "durable_objects": {
+    "bindings": [
+      { "name": "Main", "class_name": "Main" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Main"] }
+  ]
+}
