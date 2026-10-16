@@ -1,5 +1,7 @@
 # PartyServer migration handoff — October 13, 2026
 
+> Update (2026-10-16): See the [October 16 production handoff](2026-10-16-partyserver-production.md) for the deployed Worker and verified live cutover. This page retains implementation, local validation, and remaining risk details.
+
 ## Repository and Initial State
 
 - Canonical checkout: `/Users/antoniomartinez/Documents/GitHub/planning-poker`.
